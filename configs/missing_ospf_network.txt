@@ -1,0 +1,41 @@
+!
+hostname R1
+!
+vlan 10
+ name USERS
+vlan 20
+ name SERVERS
+vlan 30
+ name VOICE
+!
+interface Loopback0
+ ip address 1.1.1.1 255.255.255.255
+!
+interface GigabitEthernet1/0/1
+ description LAN
+ ip address 192.168.1.1 255.255.255.0
+ standby 1 ip 192.168.1.254
+ standby 1 priority 110
+ standby 1 preempt
+ no shutdown
+!
+interface GigabitEthernet1/0/2
+ description Uplink to R2
+ ip address 10.0.0.1 255.255.255.252
+ no shutdown
+!
+interface GigabitEthernet1/0/3
+ description Servers
+ ip address 172.16.0.2 255.255.255.0
+ vrrp 2 ip 172.16.0.254
+ vrrp 2 priority 120
+ no shutdown
+!
+router ospf 1
+ router-id 1.1.1.1
+ network 192.168.1.0 0.0.0.255 area 0
+!
+router bgp 65001
+ neighbor 10.0.0.2 remote-as 65002
+!
+end
